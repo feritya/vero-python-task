@@ -11,17 +11,17 @@ class VehicleUploadView(APIView):
     parser_classes = [MultiPartParser]
 
     def post(self, request, *args, **kwargs):
-        # CSV dosyasını al
+        # take CSV file from the request
         csv_file = request.FILES.get('file')
         if not csv_file:
             return Response({"error": "CSV file is required."}, status=400)
 
-        # CSV verilerini oku
+        # Read the CSV file
         decoded_file = csv_file.read().decode('utf-8')
         reader = csv.DictReader(io.StringIO(decoded_file), delimiter=';')
         csv_data = list(reader)
-    
-        # Baubuddy'den access token al
+
+        #Take access token from Baubuddy API
         login_url = "https://api.baubuddy.de/index.php/login"
         login_payload = {
             "username": "365",
@@ -38,6 +38,7 @@ class VehicleUploadView(APIView):
             return Response({"error": "Failed to authenticate with Baubuddy API"}, status=500)
 
         # Araç verilerini çek
+        # vehicle data 
         vehicle_url = "https://api.baubuddy.de/dev/index.php/v1/vehicles/select/active"
         auth_headers = {
             "Authorization": f"Bearer {token}"
