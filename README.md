@@ -1,64 +1,81 @@
 
-# 🚧 VERO Python Backend Task
+VERO Python Task
 
-This repository contains the solution to the technical assignment provided by VERO Digital Solutions. The project includes both a backend REST API (built with Django) and a client-side script for processing and converting data into an Excel file.
+This project is a two-part coding task that consists of a Django REST API and a Python CLI client. The goal is to:
 
----
+- Upload a CSV file containing vehicle data
+- Merge it with Baubuddy API vehicle data
+- Process and filter the merged data
+- Generate a styled Excel file based on request parameters
+
+Project Structure
+![alt text](image-1.png)
 
 
- Project Goal
+How to Run
+1. Start the Backend (Django)
+From the project root:
 
-1. Django REST API (Server)
-   - Accepts a CSV file with vehicle information.
-   - Fetches vehicle data from Baubuddy API.
-   - Filters vehicles with valid `hu` (inspection date).
-   - Resolves `labelIds` to their associated `colorCode`.
-   - Returns a cleaned JSON response.
+```bash
+cd server
+python manage.py runserver
+```
 
-2. Client Script
-   - Takes CLI parameters:
-     - `-k/--keys` for additional columns (e.g., `kurzname`, `info`)
-     - `-c/--colored` to enable row coloring by `hu` date
-   - Sends the CSV to the backend API.
-   - Processes JSON response.
-   - Generates a styled Excel file using `openpyxl`.
+API will be available at:  
+`http://127.0.0.1:8000/api/upload/`
 
----
+ 2. Prepare the CSV File
+ Place your `vehicles.csv` file in the `/client` folder.  
+The file must be **semicolon-delimited (;)** and include headers like:
 
-## ⚙️ Technologies Used
+```csv
+gruppe;kurzname;langtext;info;lagerort;labelIds
+LKW;PB V 1300;MAN 26.440;"Details...";Paderborn;
+```
 
-- Python 3.x
-- Django + Django REST Framework
-- Pandas
-- Requests
-- Openpyxl
+3. Run the Client Script
+In a new terminal, navigate to the client folder:
 
----
+```bash
+cd client
+python main.py -k kurzname info -c
+```
+Available Options:
+- `-k` or `--keys` → Extra fields to include in Excel (e.g., `kurzname`, `info`)
+- `-c` or `--colored` → Enable row coloring based on `hu` date
 
- Functional Requirements
 
-- [ ] Upload CSV to a Django endpoint
-- [ ] Fetch and merge data from `https://api.baubuddy.de`
-- [ ] Resolve `labelIds` to color codes
-- [ ] Filter vehicles missing `hu`
-- [ ] Return structured JSON data
-- [ ] Generate an Excel file with:
-  - Dynamic columns from `--keys`
-  - Colored rows based on `hu` date logic
-  - Text color from `labelIds` if provided
+Excel Output
 
----
+An Excel file will be generated with this format:
 
-How to Use
+- Filename: `vehicles_YYYY-MM-DD.xlsx`
+- Columns: Always includes `rnr`, `gruppe` + any additional `-k` keys
+- Coloring (if `-c` enabled):
+  - 🟢 Green if `hu` < 3 months old
+  - 🟠 Orange if `hu` < 12 months
+  - 🔴 Red if `hu` > 12 months
 
-Coming soon – step-by-step setup & usage instructions will be added as the implementation progresses.
+  Authorization (Baubuddy API)
+Authentication is handled via a login request. The token is used to authorize further API calls.
 
----
+ ✅ Features Implemented
+- [x] Django REST endpoint for CSV upload and Baubuddy merge
+- [x] Authentication & label color resolution
+- [x] Filtering based on `hu` and label existence
+- [x] CLI client with `argparse` and `requests`
+- [x] Excel generation with OpenPyXL and row coloring
 
-Timeline & Progress
+Requirements
+- Python 3.10+
+- Django 4+
+- openpyxl
+- requests
 
-- [ ] Repo created and initialized
-- [ ] Django backend scaffolding
-- [ ] API implementation with file upload
-- [ ] Client script implementation
-- [ ] Full integration and testing
+> Install dependencies using `pip install -r requirements.txt` (if requirements file is added)
+
+Contact
+
+Prepared by Ferit Yaşar for VERO Digital Solutions recruitment task.  
+GitHub: [github.com/feritya](https://github.com/feritya)
+E-mail:yasarferit13@gmail.com

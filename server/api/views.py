@@ -37,8 +37,8 @@ class VehicleUploadView(APIView):
         if not token:
             return Response({"error": "Failed to authenticate with Baubuddy API"}, status=500)
 
-        # Araç verilerini çek
-        # vehicle data 
+        # Fetch vehicle data
+
         vehicle_url = "https://api.baubuddy.de/dev/index.php/v1/vehicles/select/active"
         auth_headers = {
             "Authorization": f"Bearer {token}"
@@ -46,10 +46,11 @@ class VehicleUploadView(APIView):
         vehicle_response = requests.get(vehicle_url, headers=auth_headers)
         vehicles = vehicle_response.json()
 
-        # Sadece 'hu' alanı dolu olanları al
+        # Keep only entries where the 'hu' field is not null
+
         filtered = [v for v in vehicles if v.get("hu")]
 
-        # labelIds çözümle
+        # Resolve labelIds
         for v in filtered:
             label_ids = v.get("labelIds")
             if label_ids:
